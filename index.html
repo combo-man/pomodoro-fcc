@@ -1,0 +1,82 @@
+<!DOCTYPE=html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono" rel="stylesheet"> 
+</head>
+<body style='font-family:"Fira Mono", monospace'>
+    <script>
+        function formatTime(v,i) {
+            var min = i ? v : Math.floor(v/15)*15;
+            return new Date(1000*min)
+                .toISOString()
+                .substr(14,5);
+        }
+        window.onload = function() {
+            var playing = false;
+            var isSession = true; 
+            var pom = document.getElementById('pom');
+            var time = pom.value;
+            var pomDisplay = document.getElementById('pom-display');
+            var br = document.getElementById('br'); 
+            var brDisplay = document.getElementById('br-display');
+            var clock = document.getElementById('clock');
+            var startButton = document.getElementById('start-button');
+            var resetButton = document.getElementById('reset-button');
+            var currentClock = document.getElementById('current-clock');
+            startButton.onclick = function() {
+                playing = !playing; 
+                time = Math.floor(pom.value/15)*15;
+                if(playing) {
+                    startButton.textContent = 'stop';
+                    pom.disabled = true;
+                    br.disabled = true;
+                    isSession = true; 
+                } else {
+                    startButton.textContent = 'start';
+                    pom.disabled = false;
+                    br.disabled = false;
+                    isSession = true; 
+                }
+            }
+            function updateDisplay() {
+                currentClock.textContent = isSession ? 'Pomodoro!' : 'Break!';
+                pomDisplay.textContent = formatTime(pom.value);
+                brDisplay.textContent  = formatTime(br.value);
+                clock.textContent = formatTime(time,true);
+                window.requestAnimationFrame(updateDisplay);
+            }
+            window.requestAnimationFrame(updateDisplay);
+            function animatePom() {
+                if(playing) {
+                    time -= 1; 
+                }
+                if(time <= 0) {
+                    if(isSession) {
+                        isSession = false;
+                        time = Math.floor(br.value/15)*15;
+                    } else {
+                        isSession = true;
+                        time = Math.floor(pom.value/15)*15;
+                    }
+                }
+            }
+            window.setInterval(animatePom,1000);
+        }
+    </script>
+    <div style='width:75%;margin:0 auto;text-align: center;display: flex'>
+        <div style='font-size:3vw;width: 33%'>
+            <div>Session Time</div>
+            <div id='pom-display'>25:00</div>
+            <input style='width:100%;margin:0 auto;' id='pom' type='range' min='0' max='1800' value='1500' >
+        </div>
+        <div style='font-size:4vw; width:33%'>
+            <div id='current-clock'>Pomodoro!</div>
+            <div id='clock'>25:00</div>
+            <button style='width:100%;font-size:4vw;'id='start-button' type='button'>Start</button>
+        </div>
+        <div style='font-size:3vw; width:33%'>
+            <div>Break Time</div>
+            <div id='br-display'>25:00</div>
+            <input style='width:100%;margin:0 auto;'id='br' type='range' min='0' max='1800' value='1500'>
+        </div>
+    </div>
+</body>
